@@ -1,13 +1,17 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 
 	"github.com/JMitchell159/blog_aggregator/internal/config"
+	"github.com/JMitchell159/blog_aggregator/internal/database"
+	_ "github.com/lib/pq"
 )
 
 type state struct {
+	db  *database.Queries
 	cfg *config.Config
 }
 
@@ -22,11 +26,22 @@ func main() {
 		cfg: c,
 	}
 
+	db, err := sql.Open("postgres", s.cfg.DB_URL)
+	if err != nil {
+		fmt.Printf("%v\n", err)
+		os.Exit(1)
+	}
+
+	dbQueries := database.New(db)
+
+	s.db = dbQueries
+
 	cmds := commands{
 		handler: make(map[string]func(*state, command) error),
 	}
 
 	cmds.register("login", handlerLogin)
+	cmds.register("register", handlerRegister)
 	inputs := os.Args
 	if len(inputs) < 2 {
 		fmt.Println("not enough arguments provided")
