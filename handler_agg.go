@@ -71,5 +71,29 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 }
 
 func handlerAgg(s *state, cmd command) error {
+	if cmd.args != nil {
+		fmt.Println("Warning, agg command takes no arguments:")
+		for _, arg := range cmd.args {
+			fmt.Printf("%s argument ignored\n", arg)
+		}
+	}
+
+	feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Channel:")
+	fmt.Printf("\tTitle: \"%s\"\n", feed.Channel.Title)
+	fmt.Printf("\tLink: \"%s\"\n", feed.Channel.Link)
+	fmt.Printf("\tDescription: \"%s\"\n", feed.Channel.Description)
+	for i, item := range feed.Channel.Item {
+		fmt.Printf("\tItem %d:\n", i+1)
+		fmt.Printf("\t\tTitle: \"%s\"\n", item.Title)
+		fmt.Printf("\t\tLink: \"%s\"\n", item.Link)
+		fmt.Printf("\t\tDescription: \"%s\"\n", item.Description)
+		fmt.Printf("\t\tPublish Date: \"%s\"\n", item.PubDate)
+	}
+
 	return nil
 }

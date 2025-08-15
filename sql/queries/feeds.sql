@@ -23,3 +23,7 @@ WHERE user_id IN (
     FROM users
     WHERE users.name = $1
 );
+
+-- name: GetFeeds :many
+SELECT *
+FROM feeds;
