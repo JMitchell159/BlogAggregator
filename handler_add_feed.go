@@ -34,6 +34,14 @@ func handlerAddFeed(s *state, cmd command) error {
 		return err
 	}
 
+	err = handlerFollow(s, command{
+		name: "follow",
+		args: []string{feed.Url},
+	})
+	if err != nil {
+		return err
+	}
+
 	fmt.Printf("Feed was created for %s with the following data:\n", feedUser.Name)
 	fmt.Printf("ID: %v\n", feed.ID)
 	fmt.Printf("Created: %v\n", feed.CreatedAt)
