@@ -6,13 +6,6 @@ import (
 )
 
 func handlerFeeds(s *state, cmd command) error {
-	if cmd.args != nil {
-		fmt.Println("Warning, feeds command takes no arguments:")
-		for _, arg := range cmd.args {
-			fmt.Printf("%s argument ignored\n", arg)
-		}
-	}
-
 	feeds, err := s.db.GetFeeds(context.Background())
 	if err != nil {
 		return err

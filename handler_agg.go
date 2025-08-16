@@ -71,13 +71,6 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 }
 
 func handlerAgg(s *state, cmd command) error {
-	if cmd.args != nil {
-		fmt.Println("Warning, agg command takes no arguments:")
-		for _, arg := range cmd.args {
-			fmt.Printf("%s argument ignored\n", arg)
-		}
-	}
-
 	feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
 	if err != nil {
 		return err

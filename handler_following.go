@@ -6,13 +6,6 @@ import (
 )
 
 func handlerFollowing(s *state, cmd command) error {
-	if cmd.args != nil {
-		fmt.Println("Warning, following command takes no arguments:")
-		for _, arg := range cmd.args {
-			fmt.Printf("%s argument ignored\n", arg)
-		}
-	}
-
 	follows, err := s.db.GetFeedFollowsForUser(context.Background(), *s.cfg.Current_User_Name)
 	if err != nil {
 		return err
