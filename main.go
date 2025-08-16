@@ -44,12 +44,12 @@ func main() {
 	cmds.register("register", handlerRegister)
 	cmds.register("reset", middlewareArgsWarn(handlerReset))
 	cmds.register("users", middlewareArgsWarn(handlerUsers))
-	cmds.register("agg", middlewareArgsWarn(handlerAgg))
 	cmds.register("addfeed", middlewareLoggedIn(handlerAddFeed))
 	cmds.register("feeds", middlewareArgsWarn(handlerFeeds))
 	cmds.register("follow", middlewareLoggedIn(handlerFollow))
 	cmds.register("following", middlewareArgsWarn(handlerFollowing))
 	cmds.register("unfollow", middlewareLoggedIn(handlerUnfollow))
+	cmds.register("agg", handlerAgg)
 
 	inputs := os.Args
 	if len(inputs) < 2 {

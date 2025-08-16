@@ -2,12 +2,16 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"html"
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/JMitchell159/blog_aggregator/internal/database"
 )
 
 type RSSFeed struct {
@@ -70,23 +74,54 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	return &feed, nil
 }
 
-func handlerAgg(s *state, cmd command) error {
-	feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
+func scrapeFeeds(s *state) error {
+	feed, err := s.db.GetNextFeedToFetch(context.Background())
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("Channel:")
-	fmt.Printf("\tTitle: \"%s\"\n", feed.Channel.Title)
-	fmt.Printf("\tLink: \"%s\"\n", feed.Channel.Link)
-	fmt.Printf("\tDescription: \"%s\"\n", feed.Channel.Description)
-	for i, item := range feed.Channel.Item {
-		fmt.Printf("\tItem %d:\n", i+1)
-		fmt.Printf("\t\tTitle: \"%s\"\n", item.Title)
-		fmt.Printf("\t\tLink: \"%s\"\n", item.Link)
-		fmt.Printf("\t\tDescription: \"%s\"\n", item.Description)
-		fmt.Printf("\t\tPublish Date: \"%s\"\n", item.PubDate)
+	err = s.db.MarkFeedFetched(context.Background(), database.MarkFeedFetchedParams{
+		LastFetchedAt: sql.NullTime{
+			Time:  time.Now(),
+			Valid: true,
+		},
+		UpdatedAt: time.Now(),
+		ID:        feed.ID,
+	})
+	if err != nil {
+		return err
+	}
+
+	rssFeed, err := fetchFeed(context.Background(), feed.Url)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Feed Titles:")
+	for _, item := range rssFeed.Channel.Item {
+		fmt.Printf(" > %s\n", item.Title)
 	}
 
 	return nil
+}
+
+func handlerAgg(s *state, cmd command) error {
+	if cmd.args == nil {
+		return errors.New("the aggregate handler expects a single argument, a duration string")
+	}
+
+	t, err := time.ParseDuration(cmd.args[0])
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Collecting feeds every %s", cmd.args[0])
+
+	ticker := time.NewTicker(t)
+	for ; ; <-ticker.C {
+		err = scrapeFeeds(s)
+		if err != nil {
+			return err
+		}
+	}
 }
