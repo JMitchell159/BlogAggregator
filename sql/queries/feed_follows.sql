@@ -29,3 +29,11 @@ WHERE feed_follows.user_id IN (
     FROM users
     WHERE users.name = $1
 );
+
+-- name: DeleteFeedFollow :exec
+DELETE FROM feed_follows
+WHERE feed_follows.user_id = $1 AND feed_follows.feed_id IN (
+    SELECT feeds.id
+    FROM feeds
+    WHERE url = $2
+);
