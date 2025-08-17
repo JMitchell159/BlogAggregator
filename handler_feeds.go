@@ -19,7 +19,7 @@ func handlerFeeds(s *state, cmd command) error {
 		}
 		fmt.Printf("Feed Name: %s\n", feed.Name)
 		fmt.Printf("Feed URL: %s\n", feed.Url)
-		fmt.Printf("Feed Creator: %s\n", user.Name)
+		fmt.Printf("Feed Adder: %s\n", user.Name)
 		fmt.Println("===========================")
 	}
 

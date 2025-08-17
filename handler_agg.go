@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/JMitchell159/blog_aggregator/internal/database"
+	"github.com/google/uuid"
 )
 
 type RSSFeed struct {
@@ -97,9 +98,46 @@ func scrapeFeeds(s *state) error {
 		return err
 	}
 
-	fmt.Println("Feed Titles:")
+	fmt.Printf("%s Feed Titles:\n", feed.Name)
 	for _, item := range rssFeed.Channel.Item {
-		fmt.Printf(" > %s\n", item.Title)
+		t, err := time.Parse(time.RFC1123, item.PubDate)
+		if err != nil {
+			t, err = time.Parse(time.RFC1123Z, item.PubDate)
+			if err != nil {
+				return err
+			}
+		}
+
+		ok := len(item.Title) > 0
+		if _, err := s.db.GetPostByTitle(context.Background(), sql.NullString{
+			String: item.Title,
+			Valid:  ok,
+		}); err == nil {
+			continue
+		}
+		ok1 := len(item.Description) > 0
+
+		post, err := s.db.CreatePost(context.Background(), database.CreatePostParams{
+			ID:        uuid.New(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Title: sql.NullString{
+				String: item.Title,
+				Valid:  ok,
+			},
+			Url: item.Link,
+			Description: sql.NullString{
+				String: item.Description,
+				Valid:  ok1,
+			},
+			PublishedAt: t,
+			FeedID:      feed.ID,
+		})
+		if err != nil {
+			return err
+		}
+
+		fmt.Printf(" > %s\n", post.Title.String)
 	}
 
 	return nil
@@ -115,7 +153,7 @@ func handlerAgg(s *state, cmd command) error {
 		return err
 	}
 
-	fmt.Printf("Collecting feeds every %s", cmd.args[0])
+	fmt.Printf("Collecting feeds every %s\n", cmd.args[0])
 
 	ticker := time.NewTicker(t)
 	for ; ; <-ticker.C {
