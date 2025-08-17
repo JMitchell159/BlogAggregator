@@ -1,4 +1,4 @@
-module github.com/JMitchell159/blog_aggregator
+module github.com/JMitchell159/gator
 
 go 1.24.4
 

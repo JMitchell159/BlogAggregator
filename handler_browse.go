@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/JMitchell159/blog_aggregator/internal/database"
+	"github.com/JMitchell159/gator/internal/database"
 )
 
 func handlerBrowse(s *state, cmd command, user database.User) error {

@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/JMitchell159/blog_aggregator/internal/database"
+	"github.com/JMitchell159/gator/internal/database"
 	"github.com/google/uuid"
 )
 
