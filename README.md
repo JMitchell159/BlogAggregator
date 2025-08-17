@@ -9,14 +9,65 @@ Build a Blog Aggregator in Go BootDev Project
 In a Linux CLI, you just run the command `go install github.com/JMitchell159/gator`
 
 ## Additional Setup
-In your home directory, make a file called ".gatorconfig.json" and enter the following into it
+### Installing Postgres
+#### MacOS with brew
+`brew install postgresql@15`
+#### Linux/WSL (Debian)
+```
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+```
+#### Verification
+`psql --version` should return a non-error
+
+Additionally, on Linux/WSL (Debian), run this to update the password for postgres: `sudo passwd postgres`, afterwards, there will be a prompt to enter a password, enter `postgres` for simplicity
+
+### Creating the Database
+Enter the `psql` shell:
+- Mac - `psql postgres`
+- Linux/WSL (Debian) - `sudo -u postgres psql` (you will be prompted to enter the root password)
+You will be taken to a prompt that looks like this:
+```
+postgres=#
+```
+in this prompt, create the gator database by typing in the following: `CREATE DATABASE gator;`
+
+then connect to the database with the following: `\c gator`
+
+The prompt should change to this:
+```
+gator=#
+```
+On Linux/WSL (Debian), you will have to additionally enter this to set the database user's password:
+```
+ALTER USER postgres PASSWORD 'postgres';
+```
+`postgres` is used here again for simplicity.
+
+### Creating the Tables
+While still in the gator shell, enter the following commands, pressing enter after each one:
+```
+CREATE TABLE users(id UUID PRIMARY KEY, created_at TIMESTAMP NOT NULL, updated_at TIMESTAMP NOT NULL, name TEXT UNIQUE NOT NULL);
+
+CREATE TABLE feeds(id UUID PRIMARY KEY, created_at TIMESTAMP NOT NULL, updated_at TIMESTAMP NOT NULL, name TEXT NOT NULL, url TEXT UNIQUE NOT NULL, user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE, last_fetched_at TIMESTAMP);
+
+CREATE TABLE feed_follows(id UUID PRIMARY KEY, created_at TIMESTAMP NOT NULL, updated_at TIMESTAMP NOT NULL, user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE, feed_id UUID NOT NULL REFERENCES feeds(id) ON DELETE CASCADE, UNIQUE(user_id, feed_id));
+
+CREATE TABLE posts(id UUID PRIMARY KEY, created_at TIMESTAMP NOT NULL, updated_at TIMESTAMP NOT NULL, title TEXT UNIQUE, url TEXT UNIQUE NOT NULL, description TEXT, published_at TIMESTAMP NOT NULL, feed_id UUID NOT NULL REFERENCES feeds(id) ON DELETE CASCADE);
+```
+
+### Config
+Afterwards, in your home directory, make a file called ".gatorconfig.json" and enter the following into it
 ```(json)
 {
   "db_url":"postgres://postgres:postgres@localhost:5432/gator?sslmode=disable"
 }
 ```
 Here is also a single command to do the same thing as above: `touch ~/.gatorconfig.json && echo "{\"db_url\":\"postgres://postgres:postgres@localhost:5432/gator?sslmode=disable\"}" > ~/.gatorconfig.json`
+For macOS, replace the second postgres with your username and remove the third postgres, the url should look like this: `"postgres://<user_name>:@localhost:5432/gator"`
 
+### Installing Go
+Instructions for installing Go can be found [here](https://go.dev/doc/install).
 
 ## Uses
 - gator register <user_name>: registers a new user with the username (throws an error if given a duplicate name) and sets it to the current user
