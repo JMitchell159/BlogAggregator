@@ -15,6 +15,8 @@ In your home directory, make a file called ".gatorconfig.json" and enter the fol
   "db_url":"postgres://postgres:postgres@localhost:5432/gator?sslmode=disable"
 }
 ```
+Here is also a single command to do the same thing as above: `touch ~/.gatorconfig.json && echo "{\"db_url\":\"postgres://postgres:postgres@localhost:5432/gator?sslmode=disable\"}" > ~/.gatorconfig.json`
+
 
 ## Uses
 - gator register <user_name>: registers a new user with the username (throws an error if given a duplicate name) and sets it to the current user
