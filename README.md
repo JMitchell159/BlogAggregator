@@ -24,6 +24,6 @@ In your home directory, make a file called ".gatorconfig.json" and enter the fol
 - gator follow <feed_name>: adds a record to the feed_follows table relating the feed with the current user
 - gator unfollow <feed_name>: deletes a record from the feed_follows table that relates the feed with the current user
 - gator following: lists all of the feeds and their data that the current user is following
-- gator agg <interval>: inserts all items as posts from feeds that the current user is following into the posts table. Feeds are processed in a loop at the start of each interval, always prioritizing either the one that has not been checked in a while or the one with the earliest publish date that has not been checked
+- gator agg <time_interval>: inserts all items as posts from feeds that the current user is following into the posts table. Feeds are processed in a loop at the start of each interval, always prioritizing either the one that has not been checked in a while or the one with the earliest publish date that has not been checked
 - gator browse [limit]: lists (limit) of the most recent posts by time published, limit defaults to 2
 - gator reset: Resets the entire database (USE WITH EXTREME CAUTION)
