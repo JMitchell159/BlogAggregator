@@ -28,6 +28,7 @@ Additionally, on Linux/WSL (Debian), run this to update the password for postgre
 Enter the `psql` shell:
 - Mac - `psql postgres`
 - Linux/WSL (Debian) - `sudo -u postgres psql` (you will be prompted to enter the root password)
+- 
 You will be taken to a prompt that looks like this:
 ```
 postgres=#
